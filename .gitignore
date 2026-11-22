@@ -51,3 +51,4 @@ env/
 # Runtime outputs & Screenshots
 screenshots/*.png
 !screenshots/.gitkeep
+HANDOVER.md
