@@ -1,0 +1,17 @@
+# Core vision and numerical computing
+opencv-python>=4.8.0
+mediapipe>=0.10.9
+numpy>=1.24.0
+pillow>=10.0.0
+
+# Audio engine
+pygame>=2.5.0
+
+# Cloud & Database
+supabase>=2.0.0
+python-dotenv>=1.0.0
+requests>=2.31.0
+
+# UI & Gallery
+customtkinter>=5.2.0
+packaging>=23.0
