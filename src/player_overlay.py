@@ -51,46 +51,51 @@ class PlayerOverlayManager:
         card = np.zeros((card_h, card_w, 4), dtype=np.uint8)
 
         theme = PLAYER_THEMES.get(player_id, {"primary": (220, 220, 220), "accent": COLOR_ACCENT, "number": "00", "club": "CHAMPIONS"})
+        # The card is BGRA: 3-component colors would write alpha=0 and punch transparent holes
+        accent = (*theme["accent"], 255)
+        white = (255, 255, 255, 255)
 
         # Card container with rounded styling
         margin = 12
         cv2.rectangle(card, (margin, margin), (card_w - margin, card_h - margin), (*theme["primary"], 235), -1)
-        cv2.rectangle(card, (margin, margin), (card_w - margin, card_h - margin), (*theme["accent"], 255), 3)
+        cv2.rectangle(card, (margin, margin), (card_w - margin, card_h - margin), accent, 3)
 
         # Header bar
         cv2.rectangle(card, (margin, margin), (card_w - margin, margin + 45), (15, 18, 26, 255), -1)
         club_text = theme["club"]
         (cw, _), _ = cv2.getTextSize(club_text, cv2.FONT_HERSHEY_DUPLEX, 0.45, 1)
         cv2.putText(card, club_text, (card_w // 2 - cw // 2, margin + 30),
-                    cv2.FONT_HERSHEY_DUPLEX, 0.45, theme["accent"], 1)
+                    cv2.FONT_HERSHEY_DUPLEX, 0.45, accent, 1)
 
         # Jersey Number Badge
         num_str = theme["number"]
         cv2.circle(card, (margin + 36, margin + 90), 24, (15, 18, 26, 255), -1)
         cv2.putText(card, num_str, (margin + 26, margin + 98),
-                    cv2.FONT_HERSHEY_DUPLEX, 0.7, theme["accent"], 2)
+                    cv2.FONT_HERSHEY_DUPLEX, 0.7, accent, 2)
 
         # Player Silhouette / Pose Art placeholder
         cx, cy = card_w // 2, card_h // 2
         cv2.circle(card, (cx, cy - 35), 45, (15, 18, 26, 255), -1)  # Head
         cv2.rectangle(card, (cx - 65, cy + 20), (cx + 65, cy + 120), (15, 18, 26, 255), -1)  # Body
-        cv2.putText(card, "★ ★ ★", (cx - 36, cy + 80),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.55, theme["accent"], 1)
+        # Hershey fonts are ASCII-only ("★" renders as "???"), so draw the stars as markers
+        for dx in (-24, 0, 24):
+            cv2.drawMarker(card, (cx + dx, cy + 75), accent,
+                           markerType=cv2.MARKER_STAR, markerSize=14, thickness=1)
 
         # Player Name Banner (Bottom)
         banner_y = card_h - 110
         cv2.rectangle(card, (margin, banner_y), (card_w - margin, card_h - margin), (15, 18, 26, 255), -1)
-        cv2.line(card, (margin, banner_y), (card_w - margin, banner_y), theme["accent"], 2)
+        cv2.line(card, (margin, banner_y), (card_w - margin, banner_y), accent, 2)
 
         name_str = player_id.upper()
         (nw, _), _ = cv2.getTextSize(name_str, cv2.FONT_HERSHEY_DUPLEX, 0.75, 2)
         cv2.putText(card, name_str, (card_w // 2 - nw // 2, banner_y + 42),
-                    cv2.FONT_HERSHEY_DUPLEX, 0.75, (255, 255, 255), 2)
+                    cv2.FONT_HERSHEY_DUPLEX, 0.75, white, 2)
 
         cel_str = celebration_id.replace("_", " ").upper()
         (clw, _), _ = cv2.getTextSize(cel_str, cv2.FONT_HERSHEY_SIMPLEX, 0.45, 1)
         cv2.putText(card, cel_str, (card_w // 2 - clw // 2, banner_y + 75),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.45, theme["accent"], 1)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.45, accent, 1)
 
         return card
 

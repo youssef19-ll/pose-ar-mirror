@@ -23,6 +23,11 @@ for path in [ASSETS_DIR, MODELS_DIR, PLAYERS_DIR, AUDIO_DIR, CACHE_DIR, SCREENSH
 MODEL_PATH = MODELS_DIR / "pose_landmarker_lite.task"
 MODEL_URL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task"
 
+# Camera source: an index ("0", "1", ...) or a URL / file / device path.
+# Override with the CAMERA_SOURCE env var or in .env (e.g. CAMERA_SOURCE=http://host:8080/video).
+_camera_env = os.getenv("CAMERA_SOURCE", "0").strip()
+CAMERA_SOURCE = int(_camera_env) if _camera_env.isdigit() else _camera_env
+
 # Video & Display Settings
 # Single window split down the middle (Left: Live Feed, Right: Virtual Stadium)
 PANE_WIDTH = 640
@@ -33,12 +38,18 @@ TARGET_FPS = 30
 
 # Background Calibration Settings
 CALIBRATION_COUNTDOWN_SEC = 2.0  # Duration user steps aside to capture room
+CALIBRATION_CAPTURE_WINDOW_SEC = 0.5  # Frames are only sampled in the last part of the countdown
+CALIBRATION_MAX_FRAMES = 15       # Cap on frames kept for the temporal median (memory / CPU)
 SEGMENTATION_THRESHOLD = 0.55     # Confidence threshold for human mask (0.0 to 1.0)
 MASK_BLUR_KERNEL = (7, 7)         # Soft edge feathering for seamless blending
+
+# Pose Detection Settings
+VISIBILITY_THRESHOLD = 0.5       # Min MediaPipe landmark visibility to trust a keypoint
 
 # Dwell & Gesture Timing Settings
 DWELL_TIME_SEC = 0.8             # Seconds holding gesture before triggering celebration
 DEBOUNCE_GRACE_SEC = 0.4         # Grace period when gesture is dropped before effect vanishes
+ALPHA_FADE_TAU_SEC = 0.12        # Time constant of the overlay fade in/out (frame-rate independent)
 ACCURACY_EXPONENT = 1.2          # Scoring curve
 
 # Supabase Settings (Placeholder / .env defaults)

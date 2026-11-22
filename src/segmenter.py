@@ -5,6 +5,8 @@ import cv2
 import numpy as np
 from src.config import (
     CALIBRATION_COUNTDOWN_SEC,
+    CALIBRATION_CAPTURE_WINDOW_SEC,
+    CALIBRATION_MAX_FRAMES,
     SEGMENTATION_THRESHOLD,
     MASK_BLUR_KERNEL,
     COLOR_CYAN,
@@ -35,17 +37,23 @@ class BackgroundInpainter:
     def update_calibration(self, current_frame: np.ndarray) -> tuple[bool, float]:
         """
         Gathers frames during countdown. Returns (is_done, remaining_seconds).
-        Averages frames over time to eliminate sensor noise.
+        The first part of the countdown leaves the user time to step out; only the
+        final CALIBRATION_CAPTURE_WINDOW_SEC is sampled (capped at CALIBRATION_MAX_FRAMES)
+        and merged with a temporal median to eliminate sensor noise.
         """
         elapsed = time.time() - self.calibration_start_time
         remaining = max(0.0, CALIBRATION_COUNTDOWN_SEC - elapsed)
 
-        self.calibration_frames.append(current_frame.astype(np.float32))
+        in_capture_window = remaining <= CALIBRATION_CAPTURE_WINDOW_SEC
+        if in_capture_window and len(self.calibration_frames) < CALIBRATION_MAX_FRAMES:
+            self.calibration_frames.append(current_frame.copy())
 
         if elapsed >= CALIBRATION_COUNTDOWN_SEC:
-            # Compute temporal median/mean to get crystal clean plate
-            avg_bg = np.median(self.calibration_frames, axis=0).astype(np.uint8)
-            self.clean_bg = avg_bg
+            if self.calibration_frames:
+                stack = np.stack(self.calibration_frames, axis=0)
+                self.clean_bg = np.median(stack, axis=0).astype(np.uint8)
+            else:
+                self.clean_bg = current_frame.copy()
             self.is_calibrated = True
             self.is_calibrating = False
             self.calibration_frames = []

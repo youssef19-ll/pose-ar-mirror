@@ -97,20 +97,25 @@ class CanvasRenderer:
         cv2.putText(canvas, title, (self.width // 2 - tw // 2, 27),
                     cv2.FONT_HERSHEY_DUPLEX, 0.6, COLOR_ACCENT, 2)
 
-        # Right label: Virtual Pitch
-        cv2.putText(canvas, "VIRTUAL PITCH (SUMMONS)", (self.pane_width + 20, 26),
-                    cv2.FONT_HERSHEY_DUPLEX, 0.55, COLOR_CYAN, 1)
+        # Right label: Virtual Pitch — drawn as a caption inside the right pane, because the
+        # centered title already spans the divider and would overlap it in the top bar.
+        cv2.putText(canvas, "VIRTUAL PITCH (SUMMONS)", (self.pane_width + 20, bar_height + 24),
+                    cv2.FONT_HERSHEY_DUPLEX, 0.5, COLOR_CYAN, 1)
 
-        # Calibration Pill Badge
+        # Status block, right-aligned: [calibration]  [fps | audio]
+        margin = 16
+        audio_str = "MUTE" if sound_muted else "AUDIO ON"
+        fps_text = f"{int(fps)} FPS | {audio_str}"
+        (fw, _), _ = cv2.getTextSize(fps_text, cv2.FONT_HERSHEY_SIMPLEX, 0.42, 1)
+        fps_x = self.width - margin - fw
+        cv2.putText(canvas, fps_text, (fps_x, 26),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.42, (180, 180, 180), 1)
+
         calib_text = "ROOM CALIBRATED" if is_calibrated else "PRESS 'C' TO CALIBRATE"
         calib_color = COLOR_SUCCESS if is_calibrated else COLOR_ALERT
-        cv2.putText(canvas, calib_text, (self.width - 250, 26),
+        (cw, _), _ = cv2.getTextSize(calib_text, cv2.FONT_HERSHEY_SIMPLEX, 0.48, 1)
+        cv2.putText(canvas, calib_text, (fps_x - 20 - cw, 26),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.48, calib_color, 1)
-
-        # Audio status & FPS
-        audio_str = "MUTE" if sound_muted else "AUDIO ON"
-        cv2.putText(canvas, f"{int(fps)} FPS | {audio_str}", (self.width - 95, 26),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.42, (180, 180, 180), 1)
 
     def _draw_bottom_bar(self, canvas: np.ndarray):
         """Draws bottom control drawer hints."""
@@ -123,8 +128,6 @@ class CanvasRenderer:
         controls = (
             "[C] Calibrate Room    "
             "[S] Take Snapshot    "
-            "[TAB] Roster / Help    "
-            "[G] Photo Gallery    "
             "[M] Toggle Sound    "
             "[Q] Quit"
         )

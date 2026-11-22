@@ -24,7 +24,7 @@ def main():
     print("=" * 60)
 
     # Initialize vision and render pipeline
-    camera = CameraStream(camera_index=0, width=PANE_WIDTH, height=PANE_HEIGHT, mirror=True)
+    camera = CameraStream(width=PANE_WIDTH, height=PANE_HEIGHT, mirror=True)
     pose_segmenter = PoseSegmenter(num_poses=2)
     inpainter = BackgroundInpainter()
     renderer = CanvasRenderer()
@@ -87,8 +87,10 @@ def main():
             right_pane = inpainter.remove_person(raw_frame, seg_mask)
 
             # 7. Step 3: Overlay Player Cutout on Right Pane when active/summoned
-            if active_match is not None and alpha > 0.0:
-                right_pane = overlay_manager.overlay_player(right_pane, active_match, alpha)
+            # display_match outlives the pose so the cutout can fade out smoothly.
+            display_match = state_machine.display_match
+            if display_match is not None and alpha > 0.0:
+                right_pane = overlay_manager.overlay_player(right_pane, display_match, alpha)
 
             # 8. Compose Final Dual-Screen Broadcast Canvas
             celebration_title = None
@@ -126,6 +128,8 @@ def main():
                 cv2.imwrite(str(save_path), canvas)
                 print(f"[Main] Saved screenshot: {save_path}")
 
+    except KeyboardInterrupt:
+        print("\n[Main] Interrupted (Ctrl+C).")
     finally:
         camera.release()
         pose_segmenter.close()

@@ -53,7 +53,7 @@ def test_celebrations_and_state_machine():
     print("[OK] Player overlay rendering & procedural card generation verified.")
 
     # 3. Full Integrated Dual-Canvas Verification
-    camera = CameraStream(camera_index=0, width=PANE_WIDTH, height=PANE_HEIGHT, mirror=True)
+    camera = CameraStream(width=PANE_WIDTH, height=PANE_HEIGHT, mirror=True)
     success, raw_frame = camera.read()
     assert success
 
