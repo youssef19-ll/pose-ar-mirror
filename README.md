@@ -1,4 +1,4 @@
-# ⚽ Champions Celebration AR Mirror - Reconnaissance de Poses & Réalité Augmentée en Temps Réel
+# Champions Celebration AR Mirror - Reconnaissance de Poses & Réalité Augmentée en Temps Réel
 
 [![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Computer Vision](https://img.shields.io/badge/OpenCV-4.8%2B-green.svg)](https://opencv.org/)
@@ -59,7 +59,7 @@ L'architecture est structurée en un pipeline modulaire synchrone optimisé pour
 
 ---
 
-## ⚙️ 3. Choix Techniques & Justifications
+## 3. Choix Techniques & Justifications
 
 ### 1. MediaPipe Pose Landmarker (Modèle Task Lite) vs Détection d'Image Brute (CNN / YOLO)
 - **Choix retenu** : `MediaPipe Pose Landmarker Lite (33 repères 3D)` via le fichier de modèle Google TFLite embarqué (`pose_landmarker_lite.task`).
@@ -92,7 +92,7 @@ Au lieu d'un modèle opaque difficile à corriger, la détection repose sur des 
 
 ---
 
-## 🗺️ 4. État d'Avancement & Feuille de Route (Roadmap)
+## 4. État d'Avancement & Feuille de Route (Roadmap)
 
 Le projet est conçu de façon modulaire avec des jalons clairs :
 
@@ -139,7 +139,7 @@ handsign_recognizing/
 
 ---
 
-## 🚀 6. Installation & Utilisation
+## 6. Installation & Utilisation
 
 ### 1. Prérequis
 - Système d'exploitation : Ubuntu (WSL2 ou natif) ou Linux
@@ -149,7 +149,6 @@ handsign_recognizing/
 ### 2. Installation de l'environnement virtuel
 ```bash
 # Se placer dans le répertoire du projet
-cd /home/youssef19/handsign_recognizing
 
 # Créer l'environnement virtuel (s'il n'existe pas déjà)
 python3 -m venv .venv
